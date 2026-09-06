@@ -7,7 +7,8 @@ import {
   Typography,
   Alert,
   Snackbar,
-  Paper
+  Paper,
+  useTheme
 } from '@mui/material';
 import { FiCpu } from 'react-icons/fi';
 
@@ -41,6 +42,7 @@ import {
 } from '../services/riskApi.js';
 
 export default function Dashboard() {
+  const theme = useTheme();
   const location = useLocation();
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -223,7 +225,7 @@ export default function Dashboard() {
       sx={{
         display: 'flex',
         minHeight: '100vh',
-        backgroundColor: '#0D0F1A',
+        backgroundColor: theme.palette.background.default,
         position: 'relative',
         overflowX: 'hidden'
       }}
@@ -303,7 +305,7 @@ export default function Dashboard() {
                     sx={{
                       fontFamily: '"Sora", sans-serif',
                       fontWeight: 800,
-                      color: '#F8FAFC',
+                      color: theme.palette.text.primary,
                       letterSpacing: '-0.02em',
                       display: 'flex',
                       alignItems: 'center',
@@ -320,7 +322,7 @@ export default function Dashboard() {
                   <Typography
                     variant="body2"
                     sx={{
-                      color: '#94A3B8',
+                      color: theme.palette.text.secondary,
                       mt: 0.5,
                       fontSize: {
                         xs: '0.78rem',
@@ -352,13 +354,13 @@ export default function Dashboard() {
                     boxSizing: 'border-box'
                   }}
                 >
-                  <FiCpu size={20} color="#22D3EE" />
+                  <FiCpu size={20} color={theme.palette.primary.main} />
 
                   <Box>
                     <Typography
                       variant="caption"
                       sx={{
-                        color: '#22D3EE',
+                        color: theme.palette.primary.main,
                         fontWeight: 800,
                         display: 'block',
                         lineHeight: 1,
@@ -371,7 +373,7 @@ export default function Dashboard() {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: '#94A3B8',
+                        color: theme.palette.text.secondary,
                         fontSize: '0.7rem'
                       }}
                     >
@@ -562,7 +564,7 @@ export default function Dashboard() {
                         sx={{
                           fontFamily: '"Sora", sans-serif',
                           fontWeight: 800,
-                          color: '#F8FAFC',
+                          color: theme.palette.text.primary,
                           letterSpacing: '-0.02em',
                           fontSize: {
                             xs: '1.15rem',
@@ -573,7 +575,7 @@ export default function Dashboard() {
                         Risk Overview & Incident Priority Operations
                       </Typography>
                     </Box>
-                    <Typography variant="body2" sx={{ color: '#94A3B8', mt: 0.5 }}>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mt: 0.5 }}>
                       Incident severity distribution, longitudinal risk score trends, and prioritized threat escalation queues.
                     </Typography>
                   </Box>
