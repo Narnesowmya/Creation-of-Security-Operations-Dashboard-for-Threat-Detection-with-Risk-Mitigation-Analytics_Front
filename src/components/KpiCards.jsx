@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Box } from '@mui/material';
+import { Grid, Box, useTheme } from '@mui/material';
 import KpiCard from './KpiCard.jsx';
 import KpiSpotlightCard from './KpiSpotlightCard.jsx';
 import MouseGlowTiltCard from './MouseGlowTiltCard.jsx';
@@ -12,12 +12,14 @@ import {
 } from 'react-icons/fi';
 
 export default function KpiCards({ stats, loading }) {
+  const theme = useTheme();
+
   const secondaryCards = [
     {
       title: 'Total Telemetry Events',
       value: stats?.totalEvents ?? 0,
       icon: FiActivity,
-      color: { main: '#22D3EE', bg: 'rgba(34, 211, 238, 0.15)', border: 'rgba(34, 211, 238, 0.4)', glow: '0 0 15px rgba(34, 211, 238, 0.3)' },
+      color: { main: theme.palette.primary.main, bg: 'rgba(34, 211, 238, 0.15)', border: 'rgba(34, 211, 238, 0.4)', glow: '0 0 15px rgba(34, 211, 238, 0.3)' },
       trend: 'up',
       trendValue: '+12%',
       subtitle: 'Ingested security logs'
@@ -44,7 +46,7 @@ export default function KpiCards({ stats, loading }) {
       title: 'Normal Events',
       value: stats?.normalEvents ?? 0,
       icon: FiClock,
-      color: { main: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.15)', border: 'rgba(139, 92, 246, 0.4)', glow: '0 0 15px rgba(139, 92, 246, 0.3)' },
+      color: { main: theme.palette.secondary.main, bg: 'rgba(139, 92, 246, 0.15)', border: 'rgba(139, 92, 246, 0.4)', glow: '0 0 15px rgba(139, 92, 246, 0.3)' },
       trend: 'up',
       trendValue: '+5%',
       subtitle: 'Safe events stream'
@@ -66,7 +68,7 @@ export default function KpiCards({ stats, loading }) {
           <Grid container spacing={2}>
             {secondaryCards.map((card, idx) => (
               <Grid item xs={12} sm={6} key={idx}>
-                <MouseGlowTiltCard glowColor={card.color?.main || '#22D3EE'}>
+                <MouseGlowTiltCard glowColor={card.color?.main || theme.palette.primary.main}>
                   <KpiCard
                     title={card.title}
                     value={card.value}
@@ -85,4 +87,4 @@ export default function KpiCards({ stats, loading }) {
       </Grid>
     </Box>
   );
-}
+}
