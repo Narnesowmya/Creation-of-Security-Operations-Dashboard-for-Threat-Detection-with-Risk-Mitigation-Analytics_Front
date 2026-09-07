@@ -16,19 +16,29 @@ import Navbar from '../components/Navbar.jsx';
 import KpiCards from '../components/KpiCards.jsx';
 import Filters from '../components/Filters.jsx';
 import ThreatTable from '../components/ThreatTable.jsx';
+import RiskOverviewCards from '../components/RiskOverviewCards.jsx';
+import PriorityTable from '../components/PriorityTable.jsx';
 
 import ThreatDistributionChart from '../charts/ThreatDistributionChart.jsx';
 import EventTrendChart from '../charts/EventTrendChart.jsx';
 import TopAttackTypesChart from '../charts/TopAttackTypesChart.jsx';
 import ConfidenceScoreChart from '../charts/ConfidenceScoreChart.jsx';
+import RiskDistributionChart from '../charts/RiskDistributionChart.jsx';
+import RiskTrendChart from '../charts/RiskTrendChart.jsx';
 
 import NetworkTopologyBackground from '../components/NetworkTopologyBackground.jsx';
+import { FiShield } from 'react-icons/fi';
 
 import {
   getPredictions,
   getThreatSummary,
   getModelPerformance
 } from '../services/api.js';
+
+import {
+  getRiskSummary,
+  getIncidents
+} from '../services/riskApi.js';
 
 export default function Dashboard() {
   const location = useLocation();
@@ -48,17 +58,37 @@ export default function Dashboard() {
   const [predictions, setPredictions] = useState([]);
   const [stats, setStats] = useState(null);
   const [analytics, setAnalytics] = useState(null);
+  const [riskSummary, setRiskSummary] = useState(null);
+  const [incidents, setIncidents] = useState([]);
+  const [riskError, setRiskError] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setRiskError(null);
 
     try {
-      const [predictionsRes, summaryRes, perfRes] = await Promise.all([
+      const [predictionsRes, summaryRes, perfRes, riskSummaryRes, incidentsRes] = await Promise.all([
         getPredictions(),
         getThreatSummary(),
-        getModelPerformance()
+        getModelPerformance(),
+        getRiskSummary().catch((err) => {
+          console.error('Failed to load risk summary:', err);
+          setRiskError(err?.message || 'Failed to fetch risk summary');
+          return null;
+        }),
+        getIncidents().catch((err) => {
+          console.error('Failed to load incidents:', err);
+          setRiskError(err?.message || 'Failed to fetch incidents');
+          return { incidents: [] };
+        })
       ]);
+
+      if (riskSummaryRes) {
+        setRiskSummary(riskSummaryRes);
+      }
+      const incList = incidentsRes?.incidents || (Array.isArray(incidentsRes) ? incidentsRes : []);
+      setIncidents(incList);
 
       const predictionsList = predictionsRes?.predictions || predictionsRes?.data || (Array.isArray(predictionsRes) ? predictionsRes : []);
       setPredictions(predictionsList);
@@ -512,6 +542,122 @@ export default function Dashboard() {
                     />
                   </Box>
                 </Grid>
+
+                {/* =====================================================
+                    MILESTONE 3: RISK INTELLIGENCE & PRIORITY MANAGEMENT
+                   ===================================================== */}
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    minWidth: 0,
+                    mt: 2
+                  }}
+                >
+                  <Box sx={{ mb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <FiShield size={24} color="#F97316" />
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontFamily: '"Sora", sans-serif',
+                          fontWeight: 800,
+                          color: '#F8FAFC',
+                          letterSpacing: '-0.02em',
+                          fontSize: {
+                            xs: '1.15rem',
+                            sm: '1.35rem'
+                          }
+                        }}
+                      >
+                        Risk Overview & Incident Priority Operations
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: '#94A3B8', mt: 0.5 }}>
+                      Incident severity distribution, longitudinal risk score trends, and prioritized threat escalation queues.
+                    </Typography>
+                  </Box>
+
+                  {/* 6 Risk Overview KPI Cards */}
+                  <RiskOverviewCards
+                    riskSummary={riskSummary}
+                    loading={loading}
+                    error={riskError}
+                  />
+                </Grid>
+
+                {/* Risk Trend Chart (6 cols) */}
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    minWidth: 0
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      minWidth: 0,
+                      minHeight: 380
+                    }}
+                  >
+                    <RiskTrendChart
+                      incidents={incidents}
+                      loading={loading}
+                      error={riskError}
+                    />
+                  </Box>
+                </Grid>
+
+                {/* Risk Distribution Chart (6 cols) */}
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    minWidth: 0
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      minWidth: 0,
+                      minHeight: 380
+                    }}
+                  >
+                    <RiskDistributionChart
+                      incidents={incidents}
+                      loading={loading}
+                      error={riskError}
+                    />
+                  </Box>
+                </Grid>
+
+                {/* Incident Priority Table (12 cols) */}
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    minWidth: 0
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: '100%',
+                      minWidth: 0,
+                      overflowX: 'auto'
+                    }}
+                  >
+                    <PriorityTable
+                      incidents={incidents}
+                      loading={loading}
+                      error={riskError}
+                    />
+                  </Box>
+                </Grid>
               </Grid>
             </Container>
           ) : (
@@ -520,6 +666,9 @@ export default function Dashboard() {
                 predictions,
                 stats,
                 analytics,
+                riskSummary,
+                incidents,
+                riskError,
                 loading,
                 filters,
                 handleFilterChange,
@@ -532,3 +681,4 @@ export default function Dashboard() {
     </Box>
   );
 }
+

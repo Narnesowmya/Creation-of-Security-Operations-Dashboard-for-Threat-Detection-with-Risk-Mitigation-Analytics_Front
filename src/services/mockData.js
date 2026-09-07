@@ -124,4 +124,6 @@ export const INITIAL_MOCK_VULNERABILITIES = [
   { id: 'CVE-2024-5561', asset: 'Auth-Gateway-Primary', title: 'Missing Rate Limiting on Login Endpoint', severity: 'Medium', cvss: 5.3, status: 'Resolved', discoveredDate: '2026-08-05T10:00:00Z', patchAvailable: true },
   { id: 'CVE-2024-9034', asset: 'Internal-API-Gateway', title: 'Verbose Error Messages Exposing Stack Traces', severity: 'Low', cvss: 3.1, status: 'Open', discoveredDate: '2026-08-15T13:10:00Z', patchAvailable: false },
   { id: 'CVE-2024-1188', asset: 'Web-Frontend-01', title: 'Missing Security Headers (CSP, HSTS)', severity: 'Low', cvss: 2.4, status: 'Resolved', discoveredDate: '2026-08-02T09:30:00Z', patchAvailable: true }
-]
+];
+
+

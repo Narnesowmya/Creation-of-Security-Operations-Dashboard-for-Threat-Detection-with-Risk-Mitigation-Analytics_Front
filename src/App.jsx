@@ -7,6 +7,7 @@ import Vulnerabilities from './pages/Vulnerabilities.jsx'
 import Analytics from './pages/Analytics.jsx'
 import EventDetails from './pages/EventDetails.jsx'
 import Correlation from './pages/Correlation.jsx'
+import IncidentInvestigation from './pages/IncidentInvestigation.jsx'
 
 function App() {
     return (
@@ -36,6 +37,9 @@ function App() {
                                 <Route
                     path="correlation"
                     element={<Correlation />}
+                <Route
+                    path="investigation/:incidentId"
+                    element={<IncidentInvestigation />}
                 />
             </Route>
 

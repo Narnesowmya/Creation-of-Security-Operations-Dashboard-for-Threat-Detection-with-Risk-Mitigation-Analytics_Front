@@ -24,7 +24,7 @@ import {
 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
-export default function Navbar({ handleDrawerToggle, onSimulateAlert, isSimulating }) {
+export default function Navbar({ handleDrawerToggle }) {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -122,30 +122,6 @@ export default function Navbar({ handleDrawerToggle, onSimulateAlert, isSimulati
 
         {/* Far Right: Action Controls & Analyst Profile */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={onSimulateAlert}
-            disabled={isSimulating}
-            startIcon={<FiZap color="#0D0F1A" size={16} />}
-            sx={{
-              background: 'linear-gradient(135deg, #22D3EE 0%, #8B5CF6 100%)',
-              color: '#0D0F1A',
-              fontWeight: 800,
-              fontSize: '0.82rem',
-              px: 2,
-              py: 0.8,
-              boxShadow: '0 0 20px rgba(34, 211, 238, 0.35)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #38BDF8 0%, #7C3AED 100%)',
-                boxShadow: '0 0 25px rgba(34, 211, 238, 0.55)'
-              }
-            }}
-          >
-            {isSimulating ? 'Injecting Alert...' : 'Simulate Threat Alert'}
-          </Button>
-
           {/* Notifications */}
           <Tooltip title="Threat Notifications">
             <IconButton

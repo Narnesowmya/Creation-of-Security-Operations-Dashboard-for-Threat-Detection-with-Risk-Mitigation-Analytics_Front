@@ -51,6 +51,11 @@ export const STATUS_COLORS = {
     main: '#10B981',
     bg: 'rgba(16, 185, 129, 0.15)',
     border: 'rgba(16, 185, 129, 0.5)'
+  },
+  Closed: {
+    main: '#64748B',
+    bg: 'rgba(100, 116, 139, 0.15)',
+    border: 'rgba(100, 116, 139, 0.5)'
   }
 };
 
