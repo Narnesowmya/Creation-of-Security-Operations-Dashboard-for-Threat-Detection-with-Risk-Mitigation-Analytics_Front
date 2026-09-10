@@ -8,13 +8,7 @@ import {
   Grid,
   Button,
   CircularProgress,
-  Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow
+  Divider
 } from '@mui/material';
 import {
   FiArrowLeft,
@@ -77,6 +71,11 @@ const STATUS_BADGES = {
 };
 
 const PRIORITY_BADGES = {
+  'Immediate Investigation': { main: '#EF4444', bg: 'rgba(239, 68, 68, 0.2)', border: 'rgba(239, 68, 68, 0.6)' },
+  'Investigate Soon': { main: '#F97316', bg: 'rgba(249, 115, 22, 0.2)', border: 'rgba(249, 115, 22, 0.6)' },
+  'Review When Possible': { main: '#FBBF24', bg: 'rgba(251, 191, 36, 0.2)', border: 'rgba(251, 191, 36, 0.6)' },
+  'Monitor': { main: '#10B981', bg: 'rgba(16, 185, 129, 0.2)', border: 'rgba(16, 185, 129, 0.6)' },
+  'No Action Needed': { main: '#64748B', bg: 'rgba(100, 116, 139, 0.2)', border: 'rgba(100, 116, 139, 0.6)' },
   P1: { main: '#EF4444', bg: 'rgba(239, 68, 68, 0.2)', border: 'rgba(239, 68, 68, 0.6)' },
   P2: { main: '#F97316', bg: 'rgba(249, 115, 22, 0.2)', border: 'rgba(249, 115, 22, 0.6)' },
   P3: { main: '#FBBF24', bg: 'rgba(251, 191, 36, 0.2)', border: 'rgba(251, 191, 36, 0.6)' },
@@ -383,194 +382,6 @@ export default function IncidentInvestigation() {
           </Grid>
         </Grid>
 
-        {/* Section 2.5: Security Intelligence Section */}
-        <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <FiShield color="#22D3EE" size={20} />
-            <Typography variant="subtitle2" sx={{ color: '#94A3B8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Security Intelligence
-            </Typography>
-          </Box>
-
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2.5,
-              borderRadius: '12px',
-              backgroundColor: 'rgba(13, 15, 26, 0.6)',
-              border: '1px solid rgba(34, 211, 238, 0.15)'
-            }}
-          >
-            {/* Top Grid: CVE, CVSS Score, Vulnerability Status, Affected Asset Reference */}
-            <Grid container spacing={2.5} sx={{ mb: 3 }}>
-              {/* CVE ID */}
-              <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ p: 2, borderRadius: '10px', backgroundColor: 'rgba(18, 17, 31, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', height: '100%' }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 600 }}>
-                    CVE ID
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <FiDatabase size={18} color="#22D3EE" />
-                    <Typography variant="body1" sx={{ fontWeight: 700, color: '#22D3EE', fontFamily: 'monospace' }}>
-                      {incident.security_intelligence?.cve_id || 'N/A'}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Grid>
-
-              {/* CVSS Score with color-coded severity treatment */}
-              <Grid item xs={12} sm={6} md={3}>
-                {(() => {
-                  const cvssScore = incident.security_intelligence?.cvss_score;
-                  const { label: cvssSeverityLabel, style: cvssStyle } = getCvssSeverity(cvssScore);
-                  return (
-                    <Box sx={{ p: 2, borderRadius: '10px', backgroundColor: 'rgba(18, 17, 31, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', height: '100%' }}>
-                      <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 600 }}>
-                        CVSS Score
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Typography variant="body1" sx={{ fontWeight: 800, color: cvssStyle.main, fontFamily: '"Sora", sans-serif' }}>
-                          {typeof cvssScore === 'number' ? cvssScore.toFixed(1) : 'N/A'}
-                        </Typography>
-                        {cvssScore != null && (
-                          <Chip
-                            label={cvssSeverityLabel}
-                            size="small"
-                            sx={{
-                              backgroundColor: cvssStyle.bg,
-                              color: cvssStyle.main,
-                              border: `1px solid ${cvssStyle.border}`,
-                              fontWeight: 800,
-                              fontSize: '0.72rem'
-                            }}
-                          />
-                        )}
-                      </Box>
-                    </Box>
-                  );
-                })()}
-              </Grid>
-
-              {/* Vulnerability Status */}
-              <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ p: 2, borderRadius: '10px', backgroundColor: 'rgba(18, 17, 31, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', height: '100%' }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 600 }}>
-                    Vulnerability Status
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Chip
-                      label={incident.security_intelligence?.vulnerability_status || 'N/A'}
-                      size="small"
-                      sx={{
-                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                        color: '#EF4444',
-                        border: '1px solid rgba(239, 68, 68, 0.4)',
-                        fontWeight: 700,
-                        fontSize: '0.75rem'
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </Grid>
-
-              {/* Affected Asset Reference */}
-              <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ p: 2, borderRadius: '10px', backgroundColor: 'rgba(18, 17, 31, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', height: '100%' }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 600 }}>
-                    Affected Asset
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#94A3B8', fontSize: '0.85rem' }}>
-                    {incident.affected_asset || 'N/A'}{' '}
-                    <Typography component="span" variant="caption" sx={{ color: '#64748B', display: 'inline', fontStyle: 'italic' }}>
-                      (Covered in Key Attributes)
-                    </Typography>
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-
-            {/* Bottom: IOC Indicators Table */}
-            <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', mb: 1.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              IOC Indicators ({incident.security_intelligence?.ioc_indicators ? incident.security_intelligence.ioc_indicators.length : 0})
-            </Typography>
-
-            {Array.isArray(incident.security_intelligence?.ioc_indicators) && incident.security_intelligence.ioc_indicators.length > 0 ? (
-              <TableContainer
-                component={Paper}
-                elevation={0}
-                sx={{
-                  backgroundColor: 'rgba(18, 17, 31, 0.6)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '10px'
-                }}
-              >
-                <Table size="small">
-                  <TableHead sx={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
-                    <TableRow>
-                      <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Type</TableCell>
-                      <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Value</TableCell>
-                      <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Status</TableCell>
-                      <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Threat Actor</TableCell>
-                      <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Confidence</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {incident.security_intelligence.ioc_indicators.map((ioc, idx) => (
-                      <TableRow key={idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                        <TableCell sx={{ color: '#22D3EE', fontWeight: 700, fontSize: '0.82rem', borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                          {ioc.type || 'N/A'}
-                        </TableCell>
-                        <TableCell sx={{ color: '#F8FAFC', fontFamily: 'monospace', fontSize: '0.85rem', borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                          {ioc.value || 'N/A'}
-                        </TableCell>
-                        <TableCell sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                          <Chip
-                            label={ioc.status || 'Unknown'}
-                            size="small"
-                            sx={{
-                              backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                              color: '#EF4444',
-                              border: '1px solid rgba(239, 68, 68, 0.4)',
-                              fontSize: '0.72rem',
-                              fontWeight: 700
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell sx={{ color: '#94A3B8', fontSize: '0.85rem', borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                          {ioc.threat_actor || 'Unknown'}
-                        </TableCell>
-                        <TableCell sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                          <Chip
-                            label={ioc.confidence || 'Medium'}
-                            size="small"
-                            sx={{
-                              backgroundColor: ioc.confidence === 'High'
-                                ? 'rgba(239, 68, 68, 0.15)' : ioc.confidence === 'Medium'
-                                ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                              color: ioc.confidence === 'High'
-                                ? '#EF4444' : ioc.confidence === 'Medium'
-                                ? '#F59E0B' : '#10B981',
-                              border: `1px solid ${ioc.confidence === 'High'
-                                ? 'rgba(239, 68, 68, 0.4)' : ioc.confidence === 'Medium'
-                                ? 'rgba(245, 158, 11, 0.4)' : 'rgba(16, 185, 129, 0.4)'}`,
-                              fontSize: '0.72rem',
-                              fontWeight: 700
-                            }}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            ) : (
-              <Box sx={{ p: 2, borderRadius: '8px', backgroundColor: 'rgba(18, 17, 31, 0.4)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                <Typography variant="body2" sx={{ color: '#64748B' }}>No IOC indicators recorded for this incident.</Typography>
-              </Box>
-            )}
-          </Paper>
-        </Box>
-
         {/* Section 3: "Why is this high risk?" Explainability Panel */}
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
@@ -668,63 +479,65 @@ export default function IncidentInvestigation() {
 
         {/* Section 4: Related Events Section */}
         <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <FiActivity color="#8B5CF6" size={20} />
-            <Typography variant="subtitle2" sx={{ color: '#94A3B8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Related Events ({incident.related_events ? incident.related_events.length : 0})
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <FiActivity color="#8B5CF6" size={20} />
+              <Typography variant="subtitle2" sx={{ color: '#94A3B8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Related Events
+              </Typography>
+            </Box>
+            <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600 }}>
+              Total Related Events: {incident.event_count ?? incident.event_ids?.length ?? incident.related_events?.length ?? 0}
             </Typography>
           </Box>
-          {Array.isArray(incident.related_events) && incident.related_events.length > 0 ? (
-            <TableContainer
-              component={Paper}
-              elevation={0}
-              sx={{
-                backgroundColor: 'rgba(13, 15, 26, 0.6)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '12px'
-              }}
-            >
-              <Table size="small">
-                <TableHead sx={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
-                  <TableRow>
-                    <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Event ID</TableCell>
-                    <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Timestamp</TableCell>
-                    <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Source IP</TableCell>
-                    <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Description</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {incident.related_events.map((evt, idx) => (
-                    <TableRow key={evt.event_id || idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                      <TableCell sx={{ color: '#22D3EE', fontWeight: 700, fontFamily: 'monospace', borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                        {evt.event_id || 'N/A'}
-                      </TableCell>
-                      <TableCell sx={{ color: '#94A3B8', fontSize: '0.82rem', borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                        {evt.timestamp ? new Date(evt.timestamp).toLocaleString() : 'N/A'}
-                      </TableCell>
-                      <TableCell sx={{ color: '#F8FAFC', fontFamily: 'monospace', fontSize: '0.85rem', borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                        {evt.source_ip || 'N/A'}
-                      </TableCell>
-                      <TableCell sx={{ color: '#F8FAFC', fontSize: '0.88rem', borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                        {evt.description || 'N/A'}
-                      </TableCell>
-                    </TableRow>
+
+          {(() => {
+            const eventsList = (Array.isArray(incident.event_ids) && incident.event_ids.length > 0)
+              ? incident.event_ids
+              : (Array.isArray(incident.related_events) ? incident.related_events : []);
+
+            return eventsList.length > 0 ? (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2.5,
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(13, 15, 26, 0.6)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)'
+                }}
+              >
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {eventsList.map((eventId, idx) => (
+                    <Chip
+                      key={idx}
+                      label={typeof eventId === 'object' ? (eventId.event_id || String(eventId)) : String(eventId)}
+                      size="small"
+                      sx={{
+                        backgroundColor: 'rgba(139, 92, 246, 0.12)',
+                        color: '#A78BFA',
+                        border: '1px solid rgba(139, 92, 246, 0.3)',
+                        fontWeight: 600,
+                        fontSize: '0.78rem',
+                        fontFamily: 'monospace'
+                      }}
+                    />
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          ) : (
-            <Paper
-              elevation={0}
-              sx={{ p: 2.5, borderRadius: '12px', backgroundColor: 'rgba(13, 15, 26, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)' }}
-            >
-              <Typography variant="body2" sx={{ color: '#64748B' }}>No related events recorded.</Typography>
-            </Paper>
-          )}
+                </Box>
+              </Paper>
+            ) : (
+              <Paper
+                elevation={0}
+                sx={{ p: 2.5, borderRadius: '12px', backgroundColor: 'rgba(13, 15, 26, 0.6)', border: '1px solid rgba(255, 255, 255, 0.08)' }}
+              >
+                <Typography variant="body2" sx={{ color: '#64748B' }}>
+                  No related event IDs recorded.
+                </Typography>
+              </Paper>
+            );
+          })()}
         </Box>
 
-        
-                {/* Section 4.5: Attack Chain Correlation Section */}
+        {/* Section 4.5: Attack Chain Correlation Section */}
         {/* NOTE: attack_chain data is currently mock, pending Backend Task 9 (Correlation) real output. */}
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
@@ -759,268 +572,92 @@ export default function IncidentInvestigation() {
               border: '1px solid rgba(34, 211, 238, 0.2)'
             }}
           >
-            {incident?.attack_chain ? (
-              <>
-                {/* 1. Horizontal Step-Flow Visual */}
-                <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', mb: 2, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Attack Lifecycle Progression
-                </Typography>
-
-                {Array.isArray(incident.attack_chain?.stages) && incident.attack_chain.stages.length > 0 ? (() => {
-                  const stages = incident.attack_chain.stages;
-                  const currentStage = incident.attack_chain.current_stage || '';
-                  const currentIndex = stages.indexOf(currentStage);
-
-                  return (
+            {Array.isArray(incident?.attack_chain) && incident.attack_chain.length > 0 ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {[...incident.attack_chain]
+                  .sort((a, b) => (a.stage_order ?? 0) - (b.stage_order ?? 0))
+                  .map((stage, idx) => (
                     <Box
+                      key={idx}
                       sx={{
                         display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        p: 2.5,
-                        mb: 3,
+                        alignItems: 'flex-start',
+                        gap: 2,
+                        p: 2,
                         borderRadius: '10px',
                         backgroundColor: 'rgba(18, 17, 31, 0.7)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        overflowX: 'auto'
+                        border: '1px solid rgba(255, 255, 255, 0.08)'
                       }}
                     >
-                      {stages.map((stage, idx) => {
-                        const isCompleted = currentIndex !== -1 ? idx < currentIndex : false;
-                        const isCurrent = stage === currentStage;
+                      {/* Numbered Circle Badge */}
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: '50%',
+                          backgroundColor: 'rgba(34, 211, 238, 0.15)',
+                          border: '1px solid rgba(34, 211, 238, 0.5)',
+                          color: '#22D3EE',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 800,
+                          fontSize: '0.85rem',
+                          flexShrink: 0,
+                          mt: 0.5
+                        }}
+                      >
+                        {stage.stage_order ?? idx + 1}
+                      </Box>
 
-                        let nodeBg = 'rgba(255, 255, 255, 0.05)';
-                        let nodeColor = '#64748B';
-                        let nodeBorder = '1px solid rgba(255, 255, 255, 0.15)';
-                        let glowEffect = 'none';
+                      <Box sx={{ flexGrow: 1 }}>
+                        {/* Tactic & Technique Chips */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                          {stage.tactic && (
+                            <Chip
+                              label={stage.tactic}
+                              size="small"
+                              sx={{
+                                backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                                color: '#A78BFA',
+                                border: '1px solid rgba(139, 92, 246, 0.3)',
+                                fontWeight: 700,
+                                fontSize: '0.75rem'
+                              }}
+                            />
+                          )}
+                          {(stage.technique || stage.technique_name) && (
+                            <Chip
+                              label={
+                                stage.technique && stage.technique_name
+                                  ? `${stage.technique} - ${stage.technique_name}`
+                                  : stage.technique || stage.technique_name
+                              }
+                              size="small"
+                              sx={{
+                                backgroundColor: 'rgba(34, 211, 238, 0.12)',
+                                color: '#22D3EE',
+                                border: '1px solid rgba(34, 211, 238, 0.3)',
+                                fontWeight: 700,
+                                fontSize: '0.75rem'
+                              }}
+                            />
+                          )}
+                        </Box>
 
-                        if (isCompleted) {
-                          nodeBg = 'rgba(34, 211, 238, 0.15)';
-                          nodeColor = '#22D3EE';
-                          nodeBorder = '1px solid rgba(34, 211, 238, 0.5)';
-                        } else if (isCurrent) {
-                          nodeBg = 'rgba(239, 68, 68, 0.2)';
-                          nodeColor = '#EF4444';
-                          nodeBorder = '2px solid #EF4444';
-                          glowEffect = '0 0 14px rgba(239, 68, 68, 0.6)';
-                        }
-
-                        return (
-                          <React.Fragment key={stage || idx}>
-                            {/* Step Node */}
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 100, textAlign: 'center', zIndex: 1 }}>
-                              <Box
-                                sx={{
-                                  width: 36,
-                                  height: 36,
-                                  borderRadius: '50%',
-                                  backgroundColor: nodeBg,
-                                  border: nodeBorder,
-                                  color: nodeColor,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontWeight: 800,
-                                  fontSize: '0.85rem',
-                                  boxShadow: glowEffect,
-                                  mb: 1,
-                                  transition: 'all 0.3s ease'
-                                }}
-                              >
-                                {isCompleted ? '✓' : idx + 1}
-                              </Box>
-                              <Typography
-                                variant="caption"
-                                sx={{
-                                  color: isCurrent ? '#F8FAFC' : isCompleted ? '#22D3EE' : '#64748B',
-                                  fontWeight: isCurrent ? 800 : isCompleted ? 700 : 500,
-                                  fontSize: '0.78rem'
-                                }}
-                              >
-                                {stage}
-                              </Typography>
-                              {isCurrent && (
-                                <Chip
-                                  label="CURRENT STAGE"
-                                  size="small"
-                                  sx={{
-                                    mt: 0.5,
-                                    height: 18,
-                                    fontSize: '0.62rem',
-                                    fontWeight: 800,
-                                    backgroundColor: 'rgba(239, 68, 68, 0.25)',
-                                    color: '#EF4444',
-                                    border: '1px solid rgba(239, 68, 68, 0.5)'
-                                  }}
-                                />
-                              )}
-                            </Box>
-
-                            {/* Connecting Line between steps */}
-                            {idx < stages.length - 1 && (
-                              <Box
-                                sx={{
-                                  flexGrow: 1,
-                                  height: 2,
-                                  mx: 1,
-                                  mb: (isCurrent || (currentIndex !== -1 && idx === currentIndex - 1)) ? 3 : 2,
-                                  backgroundColor: (currentIndex !== -1 && idx < currentIndex) ? '#22D3EE' : 'rgba(255, 255, 255, 0.1)',
-                                  borderStyle: (currentIndex !== -1 && idx < currentIndex) ? 'solid' : 'dashed',
-                                  transition: 'all 0.3s ease'
-                                }}
-                              />
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
+                        {stage.description && (
+                          <Typography variant="body2" sx={{ color: '#F8FAFC', fontSize: '0.875rem', lineHeight: 1.5 }}>
+                            {stage.description}
+                          </Typography>
+                        )}
+                      </Box>
                     </Box>
-                  );
-                })() : (
-                  <Typography variant="body2" sx={{ color: '#64748B', mb: 2 }}>No attack stages recorded.</Typography>
-                )}
-
-                {/* 2. Key Details & Metadata */}
-                <Grid container spacing={2} sx={{ mb: 3 }}>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Box sx={{ p: 2, borderRadius: '10px', backgroundColor: 'rgba(18, 17, 31, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                      <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5, fontWeight: 600 }}>
-                        Confidence Score
-                      </Typography>
-                      <Typography variant="body1" sx={{ color: '#22D3EE', fontWeight: 700, fontFamily: 'monospace' }}>
-                        {incident.attack_chain.confidence != null ? `${incident.attack_chain.confidence}%` : 'N/A'}
-                      </Typography>
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Box sx={{ p: 2, borderRadius: '10px', backgroundColor: 'rgba(18, 17, 31, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                      <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5, fontWeight: 600 }}>
-                        Time Window
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#F8FAFC', fontSize: '0.82rem', fontFamily: 'monospace' }}>
-                        {incident.attack_chain.start_time ? new Date(incident.attack_chain.start_time).toLocaleTimeString() : 'N/A'} – {incident.attack_chain.end_time ? new Date(incident.attack_chain.end_time).toLocaleTimeString() : 'N/A'}
-                      </Typography>
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Box sx={{ p: 2, borderRadius: '10px', backgroundColor: 'rgba(18, 17, 31, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                      <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5, fontWeight: 600 }}>
-                        Target Asset
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#F8FAFC', fontWeight: 600 }}>
-                        {incident.attack_chain.asset || incident.affected_asset || 'N/A'}
-                      </Typography>
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Box sx={{ p: 2, borderRadius: '10px', backgroundColor: 'rgba(18, 17, 31, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                      <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5, fontWeight: 600 }}>
-                        Source IP
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#F8FAFC', fontFamily: 'monospace', fontWeight: 600 }}>
-                        {incident.attack_chain.source_ip || 'N/A'}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-
-                {/* MITRE Techniques & Tactics Chips */}
-                <Box sx={{ mb: 3, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                  {Array.isArray(incident.attack_chain.tactics) && incident.attack_chain.tactics.length > 0 && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                      <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, minWidth: 110 }}>
-                        TACTICS:
-                      </Typography>
-                      {incident.attack_chain.tactics.map((tactic, idx) => (
-                        <Chip
-                          key={idx}
-                          label={tactic}
-                          size="small"
-                          sx={{
-                            backgroundColor: 'rgba(139, 92, 246, 0.15)',
-                            color: '#A78BFA',
-                            border: '1px solid rgba(139, 92, 246, 0.3)',
-                            fontWeight: 700,
-                            fontSize: '0.75rem'
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  )}
-
-                  {Array.isArray(incident.attack_chain.mitre_techniques) && incident.attack_chain.mitre_techniques.length > 0 && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                      <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, minWidth: 110 }}>
-                        TECHNIQUES:
-                      </Typography>
-                      {incident.attack_chain.mitre_techniques.map((tech, idx) => (
-                        <Chip
-                          key={idx}
-                          label={tech}
-                          size="small"
-                          sx={{
-                            backgroundColor: 'rgba(34, 211, 238, 0.12)',
-                            color: '#22D3EE',
-                            border: '1px solid rgba(34, 211, 238, 0.3)',
-                            fontWeight: 700,
-                            fontSize: '0.75rem'
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  )}
-                </Box>
-
-                {/* 3. Chain Events Compact Table */}
-                <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', mb: 1.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Chain Events ({incident.attack_chain.events ? incident.attack_chain.events.length : 0})
-                </Typography>
-
-                {Array.isArray(incident.attack_chain.events) && incident.attack_chain.events.length > 0 ? (
-                  <TableContainer
-                    component={Paper}
-                    elevation={0}
-                    sx={{
-                      backgroundColor: 'rgba(18, 17, 31, 0.6)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '10px'
-                    }}
-                  >
-                    <Table size="small">
-                      <TableHead sx={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
-                        <TableRow>
-                          <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Event ID</TableCell>
-                          <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Timestamp</TableCell>
-                          <TableCell sx={{ color: '#64748B', fontWeight: 700, borderColor: 'rgba(255, 255, 255, 0.08)' }}>Event Type</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {incident.attack_chain.events.map((evt, idx) => (
-                          <TableRow key={evt.event_id || idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                            <TableCell sx={{ color: '#22D3EE', fontWeight: 700, fontFamily: 'monospace', borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                              {evt.event_id || 'N/A'}
-                            </TableCell>
-                            <TableCell sx={{ color: '#94A3B8', fontSize: '0.82rem', borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                              {evt.timestamp ? new Date(evt.timestamp).toLocaleString() : 'N/A'}
-                            </TableCell>
-                            <TableCell sx={{ color: '#F8FAFC', fontWeight: 600, fontSize: '0.85rem', borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                              {evt.event_type || 'N/A'}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                ) : (
-                  <Box sx={{ p: 2, borderRadius: '8px', backgroundColor: 'rgba(18, 17, 31, 0.4)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                    <Typography variant="body2" sx={{ color: '#64748B' }}>No individual chain events recorded.</Typography>
-                  </Box>
-                )}
-              </>
+                  ))}
+              </Box>
             ) : (
-              <Typography variant="body2" sx={{ color: '#64748B' }}>No correlated attack chain detected for this incident.</Typography>
+              <Typography variant="body2" sx={{ color: '#64748B' }}>
+                No correlated attack chain detected for this incident.
+              </Typography>
             )}
           </Paper>
         </Box>
