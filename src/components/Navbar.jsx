@@ -20,12 +20,16 @@ import {
   FiUser,
   FiSettings,
   FiLogOut,
-  FiShield
+  FiShield,
+  FiSun,
+  FiMoon
 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { useThemeMode } from '../theme/ThemeContext.jsx';
 
 export default function Navbar({ handleDrawerToggle }) {
   const navigate = useNavigate();
+  const { mode, toggleTheme } = useThemeMode();
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleProfileClick = (e) => setAnchorEl(e.currentTarget);
@@ -122,6 +126,19 @@ export default function Navbar({ handleDrawerToggle }) {
 
         {/* Far Right: Action Controls & Analyst Profile */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {/* Theme Toggle */}
+          <Tooltip title={`Switch to ${mode === 'dark' ? 'Light' : 'Dark'} Mode`}>
+            <IconButton
+              onClick={toggleTheme}
+              sx={{
+                color: '#94A3B8',
+                '&:hover': { color: '#22D3EE', backgroundColor: 'rgba(34, 211, 238, 0.1)' }
+              }}
+            >
+              {mode === 'dark' ? <FiSun size={20} /> : <FiMoon size={20} />}
+            </IconButton>
+          </Tooltip>
+
           {/* Notifications */}
           <Tooltip title="Threat Notifications">
             <IconButton

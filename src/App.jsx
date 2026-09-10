@@ -37,6 +37,7 @@ function App() {
                                 <Route
                     path="correlation"
                     element={<Correlation />}
+                />
                 <Route
                     path="investigation/:incidentId"
                     element={<IncidentInvestigation />}
