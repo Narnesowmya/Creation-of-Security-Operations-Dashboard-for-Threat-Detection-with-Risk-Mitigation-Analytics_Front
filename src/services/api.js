@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 Api merged final · JS
 import axios from 'axios';
@@ -300,8 +299,6 @@ export function getRecommendation(incidentId) {
       }
     })
 }
- 
-=======
 import axios from 'axios';
 import AxiosMockAdapter from 'axios-mock-adapter';
 import { INITIAL_MOCK_EVENTS, INITIAL_MOCK_VULNERABILITIES } from './mockData.js'
@@ -737,4 +734,3 @@ export function getRecommendation(threatId) {
     ]
   })
 }
->>>>>>> origin/main
