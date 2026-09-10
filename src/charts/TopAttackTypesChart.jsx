@@ -13,11 +13,30 @@ import { Paper, Typography, Box, Skeleton } from '@mui/material';
 import { FiBarChart2 } from 'react-icons/fi';
 import MouseGlowTiltCard from '../components/MouseGlowTiltCard.jsx';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function TopAttackTypesChart({ data = [], loading }) {
-  const labels = data.slice(0, 6).map(item => item.type);
-  const counts = data.slice(0, 6).map(item => item.count);
+  const attackTypes = [
+    'Brute Force',
+    'Malware',
+    'Phishing',
+    'SQL Injection',
+    'Privilege Escalation'
+  ];
+
+  const labels = attackTypes;
+
+  const counts = attackTypes.map((type) => {
+    const item = data.find((entry) => entry.type === type);
+    return item ? item.count : 0;
+  });
 
   const chartData = {
     labels,
@@ -30,8 +49,7 @@ export default function TopAttackTypesChart({ data = [], loading }) {
           '#F97316',
           '#FBBF24',
           '#22D3EE',
-          '#8B5CF6',
-          '#10B981'
+          '#8B5CF6'
         ],
         borderRadius: 8,
         borderSkipped: false
@@ -68,7 +86,10 @@ export default function TopAttackTypesChart({ data = [], loading }) {
         },
         ticks: {
           color: '#94A3B8',
-          font: { family: 'Inter', size: 11 },
+          font: {
+            family: 'Inter',
+            size: 11
+          },
           precision: 0
         },
         beginAtZero: true
@@ -79,7 +100,11 @@ export default function TopAttackTypesChart({ data = [], loading }) {
         },
         ticks: {
           color: '#F8FAFC',
-          font: { family: 'Inter', size: 12, weight: '600' }
+          font: {
+            family: 'Inter',
+            size: 12,
+            weight: '600'
+          }
         }
       }
     }
@@ -100,20 +125,57 @@ export default function TopAttackTypesChart({ data = [], loading }) {
           flexDirection: 'column'
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 2
+          }}
+        >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
             <FiBarChart2 size={20} color="#22D3EE" />
-            <Typography variant="h6" sx={{ fontFamily: '"Sora", sans-serif', fontWeight: 700, color: '#F8FAFC', fontSize: '1.05rem' }}>
+
+            <Typography
+              variant="h6"
+              sx={{
+                fontFamily: '"Sora", sans-serif',
+                fontWeight: 700,
+                color: '#F8FAFC',
+                fontSize: '1.05rem'
+              }}
+            >
               Top Attack Vectors Frequency
             </Typography>
           </Box>
         </Box>
 
-        <Box sx={{ flexGrow: 1, minHeight: 250, position: 'relative' }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            minHeight: 250,
+            position: 'relative'
+          }}
+        >
           {loading ? (
-            <Skeleton variant="rectangular" width="100%" height={250} sx={{ bgcolor: 'rgba(255, 255, 255, 0.08)', borderRadius: 2 }} />
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={250}
+              sx={{
+                bgcolor: 'rgba(255, 255, 255, 0.08)',
+                borderRadius: 2
+              }}
+            />
           ) : labels.length === 0 ? (
-            <Typography variant="body2" sx={{ color: '#64748B', textAlign: 'center', pt: 8 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#64748B',
+                textAlign: 'center',
+                pt: 8
+              }}
+            >
               No attack vectors match current filter criteria
             </Typography>
           ) : (

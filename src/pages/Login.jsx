@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import vigilonLogo from '../assets/vigilon-logo.svg';
 import {
   Box,
   Container,
@@ -19,7 +20,6 @@ export default function Login() {
   const navigate = useNavigate();
   const cardRef = useRef(null);
 
-  // Form State
   const [email, setEmail] = useState('analyst@vigilon.io');
   const [password, setPassword] = useState('Vigilon-SOC-2026!');
   const [showPassword, setShowPassword] = useState(false);
@@ -30,11 +30,9 @@ export default function Login() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
-  // VFX 2 & 8: Cursor Position & Parallax Depth State
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
 
-  // VFX 3: Typewriter Tagline Effect
   const fullTagline = 'AI-Powered Threat Intelligence';
   const [typedTagline, setTypedTagline] = useState('');
 
@@ -52,7 +50,6 @@ export default function Login() {
     return () => clearInterval(timer);
   }, []);
 
-  // Parallax & Radial Mouse Glow Tracker
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -66,7 +63,6 @@ export default function Login() {
     setParallax({ x: ((x - centerX) / centerX) * -6, y: ((y - centerY) / centerY) * -6 });
   };
 
-  // Icon Focus State (VFX 4)
   const [passFocused, setPassFocused] = useState(false);
 
   const handleSubmit = (e) => {
@@ -86,7 +82,6 @@ export default function Login() {
     }
 
     if (hasErr) {
-      // VFX 6: Error shake & pulse
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
       setError('Authentication failed. Verify credentials and clearance level.');
@@ -95,7 +90,6 @@ export default function Login() {
 
     setLoading(true);
 
-    // VFX 5: Success state before routing
     setTimeout(() => {
       setLoading(false);
       setIsSuccess(true);
@@ -133,13 +127,11 @@ export default function Login() {
             borderRadius: '24px',
             position: 'relative',
             overflow: 'hidden',
-            // VFX 1: Animated gradient border & glass inner top highlight
             boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 20px 50px rgba(34, 211, 238, 0.15)',
             border: '1px solid transparent',
             backgroundImage: 'linear-gradient(rgba(18, 17, 31, 0.88), rgba(18, 17, 31, 0.88)), linear-gradient(135deg, #22D3EE, #8B5CF6, #22D3EE)',
             backgroundOrigin: 'border-box',
             backgroundClip: 'padding-box, border-box',
-            // VFX 6: Error Shake Animation
             transform: isShaking ? 'translate3d(0, 0, 0)' : 'none',
             animation: isShaking ? 'cardShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both' : 'none',
             '@keyframes cardShake': {
@@ -152,7 +144,6 @@ export default function Login() {
               animation: 'none !important',
               transform: 'none !important'
             },
-            // VFX 2: Radial Cursor Light Glow Overlay
             '&::before': {
               content: '""',
               position: 'absolute',
@@ -164,7 +155,6 @@ export default function Login() {
             }
           }}
         >
-          {/* VFX 7: Ambient Scan-Line Sweep Line */}
           <Box
             sx={{
               position: 'absolute',
@@ -185,7 +175,6 @@ export default function Login() {
             }}
           />
 
-          {/* Logo Centerpiece & Parallax Container (VFX 8) */}
           <Box
             sx={{
               display: 'flex',
@@ -201,7 +190,7 @@ export default function Login() {
           >
             <Box
               component="img"
-              src="/assets/vigilon-logo.svg"
+              src={vigilonLogo}
               alt="Vigilon Logo Mark"
               sx={{
                 width: 68,
@@ -215,7 +204,6 @@ export default function Login() {
               Vigilon
             </Typography>
 
-            {/* VFX 3: Typewriter Tagline Reveal */}
             <Typography
               variant="body2"
               sx={{
@@ -261,10 +249,8 @@ export default function Login() {
             </Alert>
           )}
 
-          {/* Login Form */}
           <form onSubmit={handleSubmit}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.8 }}>
-              {/* Email Field */}
               <Box>
                 <TextField
                   fullWidth
@@ -272,22 +258,14 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   error={Boolean(emailError)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        {/* VFX 4: User icon pulse on load */}
-                        <FiUser
-                          color="#22D3EE"
-                          style={{
-                            animation: 'userIconPulse 3s infinite',
-                            '@keyframes userIconPulse': {
-                              '0%, 100%': { transform: 'scale(1)' },
-                              '50%': { transform: 'scale(1.15)', color: '#67E8F9' }
-                            }
-                          }}
-                        />
-                      </InputAdornment>
-                    )
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                          <FiUser color="#22D3EE" />
+                        </InputAdornment>
+                      )
+                    }
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -297,13 +275,22 @@ export default function Login() {
                         boxShadow: '0 0 16px rgba(34, 211, 238, 0.35)',
                         borderColor: '#22D3EE'
                       }
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: '#E2E8F0',
+                      paddingLeft: '4px'
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#94A3B8'
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': {
+                      color: '#22D3EE'
                     }
                   }}
                 />
                 {emailError && <FormHelperText error>{emailError}</FormHelperText>}
               </Box>
 
-              {/* Password Field */}
               <Box>
                 <TextField
                   fullWidth
@@ -314,30 +301,31 @@ export default function Login() {
                   onFocus={() => setPassFocused(true)}
                   onBlur={() => setPassFocused(false)}
                   error={Boolean(passwordError)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        {/* VFX 4: Lock icon rotation snap on focus */}
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            transform: passFocused ? 'rotate(-15deg) scale(1.2)' : 'rotate(0deg) scale(1)',
-                            color: passFocused ? '#22D3EE' : '#8B5CF6',
-                            transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.25s ease'
-                          }}
-                        >
-                          <FiLock size={18} />
-                        </Box>
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" sx={{ color: '#94A3B8' }}>
-                          {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
-                        </IconButton>
-                      </InputAdornment>
-                    )
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              transform: passFocused ? 'rotate(-15deg) scale(1.2)' : 'rotate(0deg) scale(1)',
+                              color: passFocused ? '#22D3EE' : '#8B5CF6',
+                              transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.25s ease'
+                            }}
+                          >
+                            <FiLock size={18} />
+                          </Box>
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" sx={{ color: '#94A3B8' }}>
+                            {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -347,13 +335,22 @@ export default function Login() {
                         boxShadow: '0 0 16px rgba(139, 92, 246, 0.35)',
                         borderColor: '#8B5CF6'
                       }
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: '#E2E8F0',
+                      paddingLeft: '4px'
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#94A3B8'
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': {
+                      color: '#8B5CF6'
                     }
                   }}
                 />
                 {passwordError && <FormHelperText error>{passwordError}</FormHelperText>}
               </Box>
 
-              {/* Submit Action Button with VFX 5 (Success Morph) */}
               <Button
                 type="submit"
                 fullWidth
@@ -383,18 +380,17 @@ export default function Login() {
                 }}
               >
                 {isSuccess
-                  ? 'ACCESS GRANTED • INITIALIZING CONSOLE...'
+                  ? 'ACCESS GRANTED - INITIALIZING CONSOLE...'
                   : loading
-                  ? 'Authenticating Credentials...'
-                  : 'Sign In to Vigilon Console'}
+                    ? 'Authenticating Credentials...'
+                    : 'Sign In to Vigilon Console'}
               </Button>
             </Box>
           </form>
 
-          {/* Footer Copyright Micro-Copy */}
           <Box sx={{ mt: 4, textAlign: 'center', borderTop: '1px solid rgba(34, 211, 238, 0.12)', pt: 2.2 }}>
             <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.72rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.6 }}>
-              <FiTerminal size={12} color="#22D3EE" /> © 2026 Vigilon · Threat Intelligence Platform
+              <FiTerminal size={12} color="#22D3EE" /> (c) 2026 Vigilon - Threat Intelligence Platform
             </Typography>
           </Box>
         </Paper>

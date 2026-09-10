@@ -23,8 +23,8 @@ export default function KpiCards({ stats, loading }) {
       subtitle: 'Ingested security logs'
     },
     {
-      title: 'High Severity Alerts',
-      value: stats?.highSeverityAlerts ?? 0,
+      title: 'High-Risk Events',
+      value: stats?.highRiskEvents ?? 0,
       icon: FiAlertTriangle,
       color: SEVERITY_COLORS.High,
       trend: 'down',
@@ -32,22 +32,22 @@ export default function KpiCards({ stats, loading }) {
       subtitle: 'Elevated threat triage'
     },
     {
-      title: 'Known Vulnerabilities',
-      value: stats?.vulnerabilities ?? 0,
+      title: 'Anomalies Detected',
+      value: stats?.anomaliesDetected ?? 0,
       icon: FiShieldOff,
       color: SEVERITY_COLORS.Medium,
       trend: 'down',
       trendValue: '-2%',
-      subtitle: 'Host CVE scanner hits'
+      subtitle: 'Flagged by AI engine'
     },
     {
-      title: 'Active Incidents',
-      value: stats?.activeIncidents ?? 0,
+      title: 'Normal Events',
+      value: stats?.normalEvents ?? 0,
       icon: FiClock,
       color: { main: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.15)', border: 'rgba(139, 92, 246, 0.4)', glow: '0 0 15px rgba(139, 92, 246, 0.3)' },
       trend: 'up',
       trendValue: '+5%',
-      subtitle: 'Open & Investigating'
+      subtitle: 'Safe events stream'
     }
   ];
 

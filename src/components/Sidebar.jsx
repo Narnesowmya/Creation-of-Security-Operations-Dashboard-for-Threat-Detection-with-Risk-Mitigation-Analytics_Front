@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import vigilonLogo from '../assets/vigilon-logo.svg';
 import {
   Box,
   Drawer,
@@ -32,7 +33,8 @@ const NAV_ITEMS = [
   { label: 'Security Events', path: '/dashboard/events', icon: FiAlertTriangle, badge: 'LIVE' },
   { label: 'Threat Intelligence', path: '/dashboard/threat-intel', icon: FiShield },
   { label: 'Vulnerabilities', path: '/dashboard/vulnerabilities', icon: FiZap },
-  { label: 'Analytics', path: '/dashboard/analytics', icon: FiBarChart2 }
+  { label: 'Analytics', path: '/dashboard/analytics', icon: FiBarChart2 },
+  { label: 'Correlation', path: '/dashboard/correlation', icon: FiZap }
 ];
 
 export default function Sidebar({ mobileOpen, handleDrawerToggle, collapsed, setCollapsed }) {
@@ -87,7 +89,7 @@ export default function Sidebar({ mobileOpen, handleDrawerToggle, collapsed, set
         >
           <Box
             component="img"
-            src="/assets/vigilon-logo.svg"
+            src={vigilonLogo}
             alt="Vigilon Logo"
             sx={{
               width: 36,
@@ -168,10 +170,14 @@ export default function Sidebar({ mobileOpen, handleDrawerToggle, collapsed, set
                   {!collapsed && (
                     <ListItemText
                       primary={item.label}
-                      primaryTypographyProps={{
-                        fontFamily: '"Sora", sans-serif',
-                        fontSize: '0.9rem',
-                        fontWeight: isActive ? 700 : 500
+                      slotProps={{
+                        primary: {
+                          sx: {
+                            fontFamily: '"Sora", sans-serif',
+                            fontSize: '0.9rem',
+                            fontWeight: isActive ? 700 : 500
+                          }
+                        }
                       }}
                     />
                   )}
@@ -257,7 +263,11 @@ export default function Sidebar({ mobileOpen, handleDrawerToggle, collapsed, set
             {!collapsed && (
               <ListItemText
                 primary="Sign Out"
-                primaryTypographyProps={{ fontFamily: '"Sora", sans-serif', fontSize: '0.88rem', fontWeight: 600 }}
+                slotProps={{
+                  primary: {
+                    sx: { fontFamily: '"Sora", sans-serif', fontSize: '0.88rem', fontWeight: 600 }
+                  }
+                }}
               />
             )}
           </ListItemButton>
@@ -275,7 +285,7 @@ export default function Sidebar({ mobileOpen, handleDrawerToggle, collapsed, set
         variant="temporary"
         open={mobileOpen}
         onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
+        slotProps={{ root: { keepMounted: true } }}
         sx={{
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 270 }
