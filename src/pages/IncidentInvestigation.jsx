@@ -538,7 +538,6 @@ export default function IncidentInvestigation() {
         </Box>
 
         {/* Section 4.5: Attack Chain Correlation Section */}
-        {/* NOTE: attack_chain data is currently mock, pending Backend Task 9 (Correlation) real output. */}
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -547,20 +546,7 @@ export default function IncidentInvestigation() {
                 Attack Chain Correlation
               </Typography>
             </Box>
-            {incident?.attack_chain?.attack_chain_id && (
-              <Chip
-                label={`ID: ${incident.attack_chain.attack_chain_id}`}
-                size="small"
-                sx={{
-                  backgroundColor: 'rgba(34, 211, 238, 0.12)',
-                  color: '#22D3EE',
-                  border: '1px solid rgba(34, 211, 238, 0.3)',
-                  fontWeight: 700,
-                  fontSize: '0.75rem',
-                  fontFamily: 'monospace'
-                }}
-              />
-            )}
+            
           </Box>
 
           <Paper
