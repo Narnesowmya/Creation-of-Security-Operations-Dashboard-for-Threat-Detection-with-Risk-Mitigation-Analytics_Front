@@ -168,11 +168,11 @@ if (USE_MOCK) {
     return prediction ? [200, prediction] : [404, { success: false, message: 'Prediction not found' }];
   });
  
-  mock.onGet('/predictions').reply(() => {
+  mock.onGet(/(?:\/api\/v1)?\/predictions$/).reply(() => {
     return [200, { success: true, predictions: MOCK_PREDICTIONS }];
   });
  
-  mock.onGet('/anomalies').reply(() => {
+  mock.onGet(/(?:\/api\/v1)?\/anomalies$/).reply(() => {
     const anomalies = MOCK_PREDICTIONS.filter(p => p.prediction === 'Suspicious');
     return [200, anomalies];
   });
@@ -221,8 +221,16 @@ export const getVulnerabilities = async () => {
 };
  
 export const getPredictions = async () => {
-  const response = await apiClient.get('/predictions');
-  return response.data;
+  const endpoint = USE_MOCK ? '/predictions' : '/api/v1/predictions';
+  const response = await apiClient.get(endpoint);
+  const data = response.data;
+  const list = Array.isArray(data)
+    ? data
+    : (data?.predictions || data?.data || []);
+  return {
+    success: true,
+    predictions: list
+  };
 };
  
 export const getEventById = async (eventId) => {
@@ -241,7 +249,8 @@ export const getModelPerformance = async () => {
 };
  
 export const getAnomalies = async () => {
-  const response = await apiClient.get('/anomalies');
+  const endpoint = USE_MOCK ? '/anomalies' : '/api/v1/anomalies';
+  const response = await apiClient.get(endpoint);
   return response.data;
 };
  
