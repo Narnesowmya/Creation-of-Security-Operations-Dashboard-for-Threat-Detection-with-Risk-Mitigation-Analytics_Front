@@ -239,13 +239,48 @@ export const getEventById = async (eventId) => {
 };
  
 export const getThreatSummary = async () => {
-  const response = await apiClient.get('/threat-summary');
-  return response.data;
+  if (USE_MOCK) {
+    const response = await apiClient.get('/threat-summary');
+    return response.data;
+  }
+  const predictionsData = await getPredictions();
+  const predictions = predictionsData.predictions || [];
+  const total_predictions = predictions.length;
+  const normal_count = predictions.filter(p => p.prediction === 'Normal' || p.prediction?.toLowerCase() === 'normal').length;
+  const suspicious_count = predictions.filter(p => p.prediction === 'Suspicious' || p.prediction?.toLowerCase() === 'suspicious').length;
+  const severity_breakdown = {
+    Low: predictions.filter(p => p.severity === 'Low' || p.severity?.toLowerCase() === 'low').length,
+    Medium: predictions.filter(p => p.severity === 'Medium' || p.severity?.toLowerCase() === 'medium').length,
+    High: predictions.filter(p => p.severity === 'High' || p.severity?.toLowerCase() === 'high').length,
+    Critical: predictions.filter(p => p.severity === 'Critical' || p.severity?.toLowerCase() === 'critical').length
+  };
+  return {
+    total_predictions,
+    normal_count,
+    suspicious_count,
+    severity_breakdown
+  };
 };
- 
+
 export const getModelPerformance = async () => {
-  const response = await apiClient.get('/model-performance');
-  return response.data;
+  if (USE_MOCK) {
+    const response = await apiClient.get('/model-performance');
+    return response.data;
+  }
+  const predictionsData = await getPredictions();
+  const predictions = predictionsData.predictions || [];
+  const total_predictions = predictions.length;
+  const normal_predictions = predictions.filter(p => p.prediction === 'Normal' || p.prediction?.toLowerCase() === 'normal').length;
+  const suspicious_predictions = predictions.filter(p => p.prediction === 'Suspicious' || p.prediction?.toLowerCase() === 'suspicious').length;
+  const anomaly_rate = total_predictions > 0 ? parseFloat((suspicious_predictions / total_predictions).toFixed(4)) : 0.0;
+  const model_version = predictions[0]?.model_version || predictions[0]?.version || 'IF_v1';
+  return {
+    total_predictions,
+    normal_predictions,
+    suspicious_predictions,
+    anomaly_rate,
+    model_version
+  };
 };
  
 export const getAnomalies = async () => {
