@@ -15,17 +15,20 @@ import {
   FiAlertTriangle,
   FiShield,
   FiCheckCircle,
+  FiClock,
   FiInfo,
   FiActivity,
   FiCpu,
   FiServer,
-  FiLock,
+  FiGlobe,
+  FiUser,
   FiTag,
   FiBarChart2,
   FiDatabase,
   FiGitCommit
 } from 'react-icons/fi';
 import { getIncidentById } from '../services/riskApi.js';
+import { updateEventStatus } from '../services/api.js';
 
 // 5-Tier Color Scheme for Risk Levels
 const RISK_LEVEL_COLORS = {
@@ -105,6 +108,26 @@ export default function IncidentInvestigation() {
   const [incident, setIncident] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [updateError, setUpdateError] = useState(null);
+
+  const handleStatusUpdate = async (newStatus) => {
+    if (!incident || !incident.incident_id) return;
+    setUpdatingStatus(true);
+    setUpdateError(null);
+    try {
+      await updateEventStatus(incident.incident_id, newStatus);
+      setIncident((prev) => ({
+        ...prev,
+        status: newStatus
+      }));
+    } catch (err) {
+      console.error('Failed to update incident status:', err);
+      setUpdateError(err?.message || `Failed to update status to ${newStatus}`);
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
 
   const handleBack = () => {
     if (window.history.state?.idx > 0) {
@@ -256,6 +279,67 @@ export default function IncidentInvestigation() {
             <Typography variant="subtitle1" sx={{ color: '#22D3EE', fontWeight: 700 }}>
               {incident.threat_type || 'Unknown Threat'}
             </Typography>
+
+            {/* Action Bar for Status Workflow */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5, mt: 1.5 }}>
+              <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Workflow Action:
+              </Typography>
+
+              {incident.status !== 'Investigating' && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  disabled={updatingStatus}
+                  startIcon={updatingStatus ? <CircularProgress size={14} color="inherit" /> : <FiClock />}
+                  onClick={() => handleStatusUpdate('Investigating')}
+                  sx={{
+                    color: '#22D3EE',
+                    borderColor: 'rgba(34, 211, 238, 0.4)',
+                    backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: 'rgba(34, 211, 238, 0.25)',
+                      borderColor: '#22D3EE'
+                    }
+                  }}
+                >
+                  Mark as Investigating
+                </Button>
+              )}
+
+              {incident.status !== 'Resolved' && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  disabled={updatingStatus}
+                  startIcon={updatingStatus ? <CircularProgress size={14} color="inherit" /> : <FiCheckCircle />}
+                  onClick={() => handleStatusUpdate('Resolved')}
+                  sx={{
+                    color: '#10B981',
+                    borderColor: 'rgba(16, 185, 129, 0.4)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: 'rgba(16, 185, 129, 0.25)',
+                      borderColor: '#10B981'
+                    }
+                  }}
+                >
+                  Mark as Resolved
+                </Button>
+              )}
+
+              {updateError && (
+                <Typography variant="caption" sx={{ color: '#EF4444', fontWeight: 600, ml: 1 }}>
+                  {updateError}
+                </Typography>
+              )}
+            </Box>
           </Box>
 
           {/* Header Right: Risk Score Prominent Display */}
@@ -307,7 +391,7 @@ export default function IncidentInvestigation() {
 
         <Grid container spacing={2.5} sx={{ mb: 4 }}>
           {/* Affected Asset */}
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: 'rgba(13, 15, 26, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', height: '100%' }}>
               <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 600 }}>
                 Affected Asset
@@ -315,14 +399,14 @@ export default function IncidentInvestigation() {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <FiServer size={18} color="#22D3EE" />
                 <Typography variant="body1" sx={{ fontWeight: 700, color: '#F8FAFC' }}>
-                  {incident.affected_asset || 'N/A'}
+                  {incident.affected_asset || incident.asset_id || 'N/A'}
                 </Typography>
               </Box>
             </Box>
           </Grid>
 
           {/* ML Confidence */}
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: 'rgba(13, 15, 26, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', height: '100%' }}>
               <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 600 }}>
                 ML Confidence
@@ -336,23 +420,38 @@ export default function IncidentInvestigation() {
             </Box>
           </Grid>
 
-          {/* IOC Status */}
-          <Grid item xs={12} sm={6} md={3}>
+          {/* Source IP */}
+          <Grid item xs={12} sm={6} md={4}>
             <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: 'rgba(13, 15, 26, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', height: '100%' }}>
               <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 600 }}>
-                IOC Status
+                Source IP
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <FiLock size={18} color="#F97316" />
-                <Typography variant="body1" sx={{ fontWeight: 700, color: '#F97316' }}>
-                  {incident.ioc_status || 'N/A'}
+                <FiGlobe size={18} color="#22D3EE" />
+                <Typography variant="body1" sx={{ fontWeight: 700, color: '#F8FAFC', fontFamily: 'monospace' }}>
+                  {incident.source_ip || incident.sourceIP || 'N/A'}
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+
+          {/* Affected User */}
+          <Grid item xs={12} sm={6} md={4}>
+            <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: 'rgba(13, 15, 26, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', height: '100%' }}>
+              <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 600 }}>
+                Affected User
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <FiUser size={18} color="#F97316" />
+                <Typography variant="body1" sx={{ fontWeight: 700, color: '#F8FAFC' }}>
+                  {incident.affected_user || incident.affectedUser || 'N/A'}
                 </Typography>
               </Box>
             </Box>
           </Grid>
 
           {/* MITRE Techniques */}
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: 'rgba(13, 15, 26, 0.6)', border: '1px solid rgba(255, 255, 255, 0.05)', height: '100%' }}>
               <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 600 }}>
                 MITRE ATT&CK Techniques
