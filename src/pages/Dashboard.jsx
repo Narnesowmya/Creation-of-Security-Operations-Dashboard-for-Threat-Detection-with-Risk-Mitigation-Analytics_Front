@@ -390,6 +390,7 @@ export default function Dashboard() {
                 <KpiCards
                   stats={stats}
                   loading={loading}
+                  riskSummary={riskSummary}
                 />
               </Box>
 
