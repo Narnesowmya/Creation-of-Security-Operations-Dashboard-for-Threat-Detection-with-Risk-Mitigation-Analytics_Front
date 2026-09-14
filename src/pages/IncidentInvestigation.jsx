@@ -15,6 +15,7 @@ import {
   FiAlertTriangle,
   FiShield,
   FiCheckCircle,
+  FiClock,
   FiInfo,
   FiActivity,
   FiCpu,
@@ -27,6 +28,7 @@ import {
   FiGitCommit
 } from 'react-icons/fi';
 import { getIncidentById } from '../services/riskApi.js';
+import { updateEventStatus } from '../services/api.js';
 
 // 5-Tier Color Scheme for Risk Levels
 const RISK_LEVEL_COLORS = {
@@ -106,6 +108,26 @@ export default function IncidentInvestigation() {
   const [incident, setIncident] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [updateError, setUpdateError] = useState(null);
+
+  const handleStatusUpdate = async (newStatus) => {
+    if (!incident || !incident.incident_id) return;
+    setUpdatingStatus(true);
+    setUpdateError(null);
+    try {
+      await updateEventStatus(incident.incident_id, newStatus);
+      setIncident((prev) => ({
+        ...prev,
+        status: newStatus
+      }));
+    } catch (err) {
+      console.error('Failed to update incident status:', err);
+      setUpdateError(err?.message || `Failed to update status to ${newStatus}`);
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
 
   const handleBack = () => {
     if (window.history.state?.idx > 0) {
@@ -257,6 +279,67 @@ export default function IncidentInvestigation() {
             <Typography variant="subtitle1" sx={{ color: '#22D3EE', fontWeight: 700 }}>
               {incident.threat_type || 'Unknown Threat'}
             </Typography>
+
+            {/* Action Bar for Status Workflow */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5, mt: 1.5 }}>
+              <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Workflow Action:
+              </Typography>
+
+              {incident.status !== 'Investigating' && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  disabled={updatingStatus}
+                  startIcon={updatingStatus ? <CircularProgress size={14} color="inherit" /> : <FiClock />}
+                  onClick={() => handleStatusUpdate('Investigating')}
+                  sx={{
+                    color: '#22D3EE',
+                    borderColor: 'rgba(34, 211, 238, 0.4)',
+                    backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: 'rgba(34, 211, 238, 0.25)',
+                      borderColor: '#22D3EE'
+                    }
+                  }}
+                >
+                  Mark as Investigating
+                </Button>
+              )}
+
+              {incident.status !== 'Resolved' && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  disabled={updatingStatus}
+                  startIcon={updatingStatus ? <CircularProgress size={14} color="inherit" /> : <FiCheckCircle />}
+                  onClick={() => handleStatusUpdate('Resolved')}
+                  sx={{
+                    color: '#10B981',
+                    borderColor: 'rgba(16, 185, 129, 0.4)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: 'rgba(16, 185, 129, 0.25)',
+                      borderColor: '#10B981'
+                    }
+                  }}
+                >
+                  Mark as Resolved
+                </Button>
+              )}
+
+              {updateError && (
+                <Typography variant="caption" sx={{ color: '#EF4444', fontWeight: 600, ml: 1 }}>
+                  {updateError}
+                </Typography>
+              )}
+            </Box>
           </Box>
 
           {/* Header Right: Risk Score Prominent Display */}
