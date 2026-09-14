@@ -19,6 +19,7 @@ import Filters from '../components/Filters.jsx';
 import ThreatTable from '../components/ThreatTable.jsx';
 import RiskOverviewCards from '../components/RiskOverviewCards.jsx';
 import PriorityTable from '../components/PriorityTable.jsx';
+import CriticalThreatPanel from '../components/CriticalThreatPanel.jsx';
 
 import ThreatDistributionChart from '../charts/ThreatDistributionChart.jsx';
 import EventTrendChart from '../charts/EventTrendChart.jsx';
@@ -654,6 +655,10 @@ export default function Dashboard() {
                       overflowX: 'auto'
                     }}
                   >
+                    <CriticalThreatPanel
+                      incidents={incidents}
+                      loading={loading}
+                    />
                     <PriorityTable
                       incidents={incidents}
                       loading={loading}
