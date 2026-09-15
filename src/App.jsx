@@ -8,6 +8,8 @@ import Analytics from './pages/Analytics.jsx'
 import EventDetails from './pages/EventDetails.jsx'
 import Correlation from './pages/Correlation.jsx'
 import IncidentInvestigation from './pages/IncidentInvestigation.jsx'
+import MitreIntelligence from './pages/MitreIntelligence.jsx'
+import IOCIntelligence from './pages/IOCIntelligence.jsx'
 
 function App() {
     return (
@@ -34,13 +36,21 @@ function App() {
                     path="analytics"
                     element={<Analytics />}
                 />
-                                <Route
+                <Route
                     path="correlation"
                     element={<Correlation />}
                 />
                 <Route
                     path="investigation/:incidentId"
                     element={<IncidentInvestigation />}
+                />
+                <Route
+                    path="mitre"
+                    element={<MitreIntelligence />}
+                />
+                <Route
+                    path="ioc"
+                    element={<IOCIntelligence />}
                 />
             </Route>
 

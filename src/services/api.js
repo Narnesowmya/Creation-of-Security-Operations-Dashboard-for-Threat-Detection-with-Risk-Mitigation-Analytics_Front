@@ -156,6 +156,11 @@ export const getVulnerabilities = async () => {
   const response = await apiClient.get('/vulnerabilities');
   return response.data;
 };
+export const getThreats = async (params = {}) => {
+  const response = await apiClient.get('/threats', { params });
+  return response.data;
+};
+ 
 
 export const getPredictions = async () => {
   const endpoint = USE_MOCK ? '/predictions' : '/api/v1/predictions';

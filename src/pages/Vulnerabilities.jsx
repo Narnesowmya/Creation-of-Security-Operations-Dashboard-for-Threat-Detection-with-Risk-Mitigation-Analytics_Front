@@ -12,7 +12,7 @@ export default function Vulnerabilities() {
     useEffect(() => {
         getVulnerabilities()
             .then((data) => {
-                setVulnerabilities(data.vulnerabilities || [])
+                setVulnerabilities(data || [])
                 setError(null)
             })
             .catch((err) => setError(err.message))
@@ -77,14 +77,14 @@ export default function Vulnerabilities() {
                                             }}
                                         />
                                         <Typography sx={{ color: '#94A3B8', fontSize: '0.75rem' }}>
-                                            CVSS {vuln.cvss}
+                                            CVSS {vuln.cvss_score}
                                         </Typography>
                                     </Box>
                                     <Typography sx={{ color: '#F8FAFC', fontWeight: 600, fontSize: '0.92rem', mb: 0.5 }}>
                                         {vuln.title}
                                     </Typography>
                                     <Typography sx={{ color: '#64748B', fontSize: '0.8rem' }}>
-                                        Asset: {vuln.asset}
+                                        Asset: {vuln.asset_id}
                                     </Typography>
                                 </Box>
 
@@ -99,14 +99,6 @@ export default function Vulnerabilities() {
                                             fontSize: '0.72rem'
                                         }}
                                     />
-                                    {vuln.patchAvailable && (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            <FiCheckCircle size={13} color="#10B981" />
-                                            <Typography sx={{ color: '#10B981', fontSize: '0.72rem', fontWeight: 600 }}>
-                                                Patch Available
-                                            </Typography>
-                                        </Box>
-                                    )}
                                 </Box>
                             </Box>
                         </Paper>
