@@ -25,14 +25,17 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiLogOut,
-  FiCpu
+  FiCpu,
+  FiCrosshair,
+  FiTarget
 } from 'react-icons/fi';
-
 const NAV_ITEMS = [
   { label: 'Overview', path: '/dashboard', icon: FiGrid },
   { label: 'Security Events', path: '/dashboard/events', icon: FiAlertTriangle, badge: 'LIVE' },
   { label: 'Threat Intelligence', path: '/dashboard/threat-intel', icon: FiShield },
   { label: 'Vulnerabilities', path: '/dashboard/vulnerabilities', icon: FiZap },
+  { label: 'MITRE ATT&CK', path: '/dashboard/mitre', icon: FiCrosshair },
+  { label: 'IOC Intelligence', path: '/dashboard/ioc', icon: FiTarget },
   { label: 'Analytics', path: '/dashboard/analytics', icon: FiBarChart2 },
   { label: 'Correlation', path: '/dashboard/correlation', icon: FiZap }
 ];
