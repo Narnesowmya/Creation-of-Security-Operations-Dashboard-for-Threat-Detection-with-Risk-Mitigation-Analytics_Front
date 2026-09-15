@@ -4,7 +4,7 @@ import { INITIAL_MOCK_EVENTS, INITIAL_MOCK_VULNERABILITIES } from './mockData.js
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
 const USE_MOCK = !API_BASE_URL;
- 
+
 // Create a central Axios client
 export const apiClient = axios.create({
   baseURL: USE_MOCK ? '/api' : API_BASE_URL,
@@ -14,15 +14,15 @@ export const apiClient = axios.create({
     ...(USE_MOCK ? {} : { 'x-api-key': API_KEY }) // confirm header name with backend
   }
 });
- 
+
 // Only attach the mock adapter when there's no real backend URL yet
 let mock = null;
 if (USE_MOCK) {
   mock = new AxiosMockAdapter(apiClient, { delayResponse: 150 });
- 
+
   // In-memory data store for live status updates/simulated live alerts
   let mockEventsDatabase = [...INITIAL_MOCK_EVENTS];
- 
+
   const MOCK_PREDICTIONS = [
     { event_id: "EVT-2001", prediction: "Suspicious", threat_type: "Brute Force", confidence_score: 94.2, anomaly_score: 0.892, severity: "Critical", model_version: "IF_v1", prediction_timestamp: "2026-08-22T10:15:30Z" },
     { event_id: "EVT-2002", prediction: "Normal", threat_type: "None", confidence_score: 99.1, anomaly_score: -0.124, severity: "Low", model_version: "IF_v1", prediction_timestamp: "2026-08-22T09:45:12Z" },
@@ -43,11 +43,11 @@ if (USE_MOCK) {
     { event_id: "EVT-2017", prediction: "Normal", threat_type: "None", confidence_score: 98.2, anomaly_score: -0.111, severity: "Low", model_version: "IF_v1", prediction_timestamp: "2026-08-21T20:20:45Z" },
     { event_id: "EVT-2018", prediction: "Suspicious", threat_type: "Malware", confidence_score: 95.8, anomaly_score: 0.915, severity: "Critical", model_version: "IF_v1", prediction_timestamp: "2026-08-21T19:50:00Z" }
   ];
- 
+
   // Helper to filter events based on request parameters
   function filterEvents(events, params = {}) {
     const { severity, eventType, searchIp, dateRange } = params;
- 
+
     return events.filter(evt => {
       if (severity && severity !== 'All') {
         if (evt.severity.toLowerCase() !== severity.toLowerCase()) return false;
@@ -76,61 +76,17 @@ if (USE_MOCK) {
       return true;
     });
   }
- 
+
   mock.onGet('/events').reply(config => {
     const filtered = filterEvents(mockEventsDatabase, config.params);
     return [200, { success: true, count: filtered.length, events: filtered }];
   });
- 
-  mock.onGet('/kpi-stats').reply(config => {
-    const filtered = filterEvents(mockEventsDatabase, config.params);
-    const stats = {
-      totalEvents: filtered.length,
-      criticalThreats: filtered.filter(e => e.severity === 'Critical').length,
-      highSeverityAlerts: filtered.filter(e => e.severity === 'High').length,
-      vulnerabilities: filtered.filter(e => e.severity === 'Medium').length + Math.floor(filtered.length * 0.4),
-      activeIncidents: filtered.filter(e => e.status === 'Open' || e.status === 'Investigating').length
-    };
-    return [200, { success: true, stats }];
-  });
- 
-  mock.onGet('/analytics').reply(config => {
-    const filtered = filterEvents(mockEventsDatabase, config.params);
- 
-    const threatDistribution = {
-      Critical: filtered.filter(e => e.severity === 'Critical').length,
-      High: filtered.filter(e => e.severity === 'High').length,
-      Medium: filtered.filter(e => e.severity === 'Medium').length,
-      Low: filtered.filter(e => e.severity === 'Low').length
-    };
- 
-    const attackCounts = {};
-    filtered.forEach(e => {
-      attackCounts[e.eventType] = (attackCounts[e.eventType] || 0) + 1;
-    });
- 
-    const topAttackTypes = Object.keys(attackCounts)
-      .map(type => ({ type, count: attackCounts[type] }))
-      .sort((a, b) => b.count - a.count);
- 
-    const trendMap = {};
-    filtered.forEach(e => {
-      const dateStr = new Date(e.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      trendMap[dateStr] = (trendMap[dateStr] || 0) + 1;
-    });
- 
-    const eventTrend = Object.keys(trendMap).map(date => ({
-      date,
-      count: trendMap[date]
-    })).reverse();
- 
-    return [200, { success: true, threatDistribution, topAttackTypes, eventTrend }];
-  });
- 
+
+
   mock.onGet('/vulnerabilities').reply(() => {
     return [200, { success: true, count: INITIAL_MOCK_VULNERABILITIES.length, vulnerabilities: INITIAL_MOCK_VULNERABILITIES }]
   });
- 
+
   mock.onPatch(/\/events\/.+/).reply(config => {
     const eventId = config.url.split('/').pop();
     const { status } = JSON.parse(config.data || '{}');
@@ -141,42 +97,22 @@ if (USE_MOCK) {
     }
     return [404, { success: false, message: 'Event not found' }];
   });
- 
-  mock.onPost('/events/simulate').reply(() => {
-    const severities = ['Critical', 'High', 'Medium'];
-    const types = ['Brute Force', 'Malware', 'SQL Injection', 'DDoS Attack', 'Data Exfiltration'];
-    const newEvt = {
-      id: `EVT-${3000 + Math.floor(Math.random() * 9000)}`,
-      timestamp: new Date().toISOString(),
-      eventType: types[Math.floor(Math.random() * types.length)],
-      severity: severities[Math.floor(Math.random() * severities.length)],
-      sourceIP: `185.220.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
-      destinationIP: '10.0.1.88',
-      status: 'Open',
-      affectedAsset: 'Auth-Gateway-Primary',
-      aiRiskScore: 92,
-      description: 'Simulated real-time automated intrusion event detected by SentinelAI engine.',
-      recommendation: 'Immediate SOC Analyst triage recommended.'
-    };
-    mockEventsDatabase.unshift(newEvt);
-    return [201, { success: true, event: newEvt }];
-  });
- 
+
+
   mock.onGet(/\/predictions\/([A-Za-z0-9-]+)/).reply(config => {
     const eventId = config.url.split('/').pop();
     const prediction = MOCK_PREDICTIONS.find(p => p.event_id === eventId);
     return prediction ? [200, prediction] : [404, { success: false, message: 'Prediction not found' }];
   });
- 
-  mock.onGet('/predictions').reply(() => {
+  mock.onGet(/(?:\/api\/v1)?\/predictions$/).reply(() => {
     return [200, { success: true, predictions: MOCK_PREDICTIONS }];
   });
- 
-  mock.onGet('/anomalies').reply(() => {
+
+  mock.onGet(/(?:\/api\/v1)?\/anomalies$/).reply(() => {
     const anomalies = MOCK_PREDICTIONS.filter(p => p.prediction === 'Suspicious');
     return [200, anomalies];
   });
- 
+
   mock.onGet('/model-performance').reply(() => {
     const total_predictions = MOCK_PREDICTIONS.length;
     const normal_predictions = MOCK_PREDICTIONS.filter(p => p.prediction === 'Normal').length;
@@ -184,7 +120,7 @@ if (USE_MOCK) {
     const anomaly_rate = total_predictions > 0 ? parseFloat((suspicious_predictions / total_predictions).toFixed(4)) : 0.0;
     return [200, { total_predictions, normal_predictions, suspicious_predictions, anomaly_rate, model_version: "IF_v1" }];
   });
- 
+
   mock.onGet('/threat-summary').reply(() => {
     const total_predictions = MOCK_PREDICTIONS.length;
     const normal_count = MOCK_PREDICTIONS.filter(p => p.prediction === 'Normal').length;
@@ -198,23 +134,24 @@ if (USE_MOCK) {
     return [200, { total_predictions, normal_count, suspicious_count, severity_breakdown }];
   });
 }
- 
+
 // -------------------------------------------------------------
 // PUBLIC API SERVICE METHODS (Callable by components via Axios)
 // -------------------------------------------------------------
- 
+
 export const getEvents = async (filters = {}) => {
   const response = await apiClient.get('/events', { params: filters });
   return response.data;
 };
- 
- 
+
+
 export const updateEventStatus = async (incidentId, newStatus) => {
-  const response = await apiClient.patch(`/api/v1/incidents/${incidentId}/status`, { status: newStatus });
+  const endpoint = USE_MOCK ? `/events/${incidentId}` : `/api/v1/incidents/${incidentId}/status`;
+  const response = await apiClient.patch(endpoint, { status: newStatus });
   return response.data;
 };
- 
- 
+
+
 export const getVulnerabilities = async () => {
   const response = await apiClient.get('/vulnerabilities');
   return response.data;
@@ -224,42 +161,52 @@ export const getThreats = async (params = {}) => {
   return response.data;
 };
  
+
 export const getPredictions = async () => {
-  const response = await apiClient.get('/predictions');
-  return response.data;
+  const endpoint = USE_MOCK ? '/predictions' : '/api/v1/predictions';
+  const response = await apiClient.get(endpoint);
+  const data = response.data;
+  const list = Array.isArray(data)
+    ? data
+    : (data?.predictions || data?.data || []);
+  return {
+    success: true,
+    predictions: list
+  };
 };
- 
+
 export const getEventById = async (eventId) => {
   const response = await apiClient.get(`/predictions/${eventId}`);
   return response.data;
 };
- 
+
 export const getThreatSummary = async () => {
   const response = await apiClient.get('/threat-summary');
   return response.data;
 };
- 
+
 export const getModelPerformance = async () => {
   const response = await apiClient.get('/model-performance');
   return response.data;
 };
- 
+
 export const getAnomalies = async () => {
-  const response = await apiClient.get('/anomalies');
+  const endpoint = USE_MOCK ? '/anomalies' : '/api/v1/anomalies';
+  const response = await apiClient.get(endpoint);
   return response.data;
 };
- 
+
 // -------------------------------------------------------------
 // Threat Correlation & Recommendations (real Task 10/11 backend)
 // -------------------------------------------------------------
- 
+
 export function getCorrelatedThreats(filters) {
   const params = {}
   if (filters.riskLevel !== 'All') params.priority = filters.riskLevel
   if (filters.status !== 'All') params.status = filters.status
   if (filters.asset !== 'All') params.asset_id = filters.asset
   if (filters.threatType !== 'All') params.threat_type = filters.threatType
- 
+
   return apiClient.get('/api/v1/incidents', { params })
     .then((res) => ({
       threats: res.data.map((incident) => ({
@@ -276,7 +223,7 @@ export function getCorrelatedThreats(filters) {
       }))
     }))
 }
- 
+
 export function getRecommendation(incidentId) {
   return apiClient.get(`/api/v1/incidents/${incidentId}`)
     .then((res) => {
@@ -288,4 +235,3 @@ export function getRecommendation(incidentId) {
       }
     })
 }
- 
