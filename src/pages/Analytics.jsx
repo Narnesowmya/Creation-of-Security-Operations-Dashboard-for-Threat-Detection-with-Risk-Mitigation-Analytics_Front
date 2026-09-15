@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Box, Typography, Paper, CircularProgress } from '@mui/material'
 import { FiBarChart2 } from 'react-icons/fi'
 import { getPredictions } from '../services/api.js'
+import { getIncidents } from '../services/riskApi.js'
 import { SEVERITY_COLORS } from '../theme/socTheme.js'
 
 export default function Analytics() {
@@ -10,14 +11,24 @@ export default function Analytics() {
     const [error, setError] = useState(null)
 
     useEffect(() => {
-        getPredictions()
-            .then((data) => {
-                const predictionsList = data?.predictions || [];
+        Promise.all([getPredictions(), getIncidents()])
+            .then(([predData, incidentData]) => {
+                const predictionsList = predData?.predictions || predData?.data || (Array.isArray(predData) ? predData : []);
+                const incidents = incidentData?.incidents || (Array.isArray(incidentData) ? incidentData : []);
+
+                const eventToIncidentMap = new Map();
+                incidents.forEach((incident) => {
+                    const eventIds = incident.event_ids || [];
+                    eventIds.forEach((eventId) => {
+                        eventToIncidentMap.set(eventId, incident);
+                    });
+                });
 
                 // 1. threatDistribution: count of records per severity value
                 const threatDistribution = { Critical: 0, High: 0, Medium: 0, Low: 0 };
                 predictionsList.forEach(p => {
-                    const severity = p.severity;
+                    const matchingIncident = eventToIncidentMap.get(p.event_id);
+                    const severity = matchingIncident?.risk_level || p.severity;
                     if (severity in threatDistribution) {
                         threatDistribution[severity]++;
                     }
@@ -33,10 +44,15 @@ export default function Analytics() {
                     .map(type => ({ type, count: attackCounts[type] }))
                     .sort((a, b) => b.count - a.count);
 
-                // 3. eventTrend: group predictions by the date portion of prediction_timestamp, count per day, sort chronologically ascending
+                // 3. eventTrend: group predictions by the date portion of timestamp, count per day, sort chronologically ascending
                 const dailyCounts = {};
                 predictionsList.forEach(p => {
-                    const dateObj = new Date(p.prediction_timestamp);
+                    const matchingIncident = eventToIncidentMap.get(p.event_id);
+                    const timestampStr = matchingIncident?.created_at || p.prediction_timestamp;
+                    if (!timestampStr) return;
+                    const dateObj = new Date(timestampStr);
+                    if (isNaN(dateObj.getTime())) return;
+
                     const dateKey = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()).getTime();
                     dailyCounts[dateKey] = (dailyCounts[dateKey] || 0) + 1;
                 });

@@ -26,7 +26,7 @@ export default function EventDetails() {
     setLoading(true);
     getEventById(eventId)
       .then((data) => {
-        const record = data?.event || data;
+        const record = data?.prediction || data?.event || data;
         if (record && record.event_id) {
           setEvent(record);
           setError(null);
