@@ -3,6 +3,7 @@ import { Box, Typography, CircularProgress } from '@mui/material'
 import Filters from '../components/Filters.jsx'
 import ThreatTable from '../components/ThreatTable.jsx'
 import { getPredictions } from '../services/api.js'
+import { getIncidents } from '../services/riskApi.js'
 
 const DEFAULT_FILTERS = {
     severity: 'All',
@@ -19,10 +20,29 @@ export default function SecurityEvents() {
 
     useEffect(() => {
         setLoading(true)
-        getPredictions()
-            .then((data) => {
-                const records = data?.predictions || data?.data || (Array.isArray(data) ? data : []);
-                setPredictions(records)
+        Promise.all([getPredictions(), getIncidents()])
+            .then(([predData, incidentData]) => {
+                const records = predData?.predictions || predData?.data || (Array.isArray(predData) ? predData : []);
+                const incidents = incidentData?.incidents || (Array.isArray(incidentData) ? incidentData : []);
+
+                const eventToIncidentMap = new Map();
+                incidents.forEach((incident) => {
+                    const eventIds = incident.event_ids || [];
+                    eventIds.forEach((eventId) => {
+                        eventToIncidentMap.set(eventId, incident);
+                    });
+                });
+
+                const enrichedPredictions = records.map((pred) => {
+                    const matchingIncident = eventToIncidentMap.get(pred.event_id);
+                    return {
+                        ...pred,
+                        resolvedSeverity: matchingIncident?.risk_level || pred.severity,
+                        resolvedTimestamp: matchingIncident?.created_at || pred.prediction_timestamp
+                    };
+                });
+
+                setPredictions(enrichedPredictions)
                 setError(null)
             })
             .catch((err) => setError(err.message))
@@ -41,7 +61,7 @@ export default function SecurityEvents() {
     const filteredPredictions = predictions.filter(pred => {
         // 1. Severity filter
         if (filters.severity && filters.severity !== 'All') {
-            if (pred.severity !== filters.severity) return false;
+            if (pred.resolvedSeverity !== filters.severity) return false;
         }
 
         // 2. Event Type filter (mapped to threat_type)

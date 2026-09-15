@@ -98,19 +98,19 @@ export default function Dashboard() {
 
       const statsObj = {
         totalEvents: summaryRes.total_predictions ?? 0,
-        anomaliesDetected: summaryRes.suspicious_count ?? 0,
-        normalEvents: summaryRes.normal_count ?? 0,
-        highRiskEvents: summaryRes.severity_breakdown?.High ?? 0,
-        criticalThreats: summaryRes.severity_breakdown?.Critical ?? 0
+        anomaliesDetected: summaryRes.suspicious_predictions ?? 0,
+        normalEvents: summaryRes.normal_predictions ?? 0,
+        highRiskEvents: summaryRes.severity_summary?.High ?? 0,
+        criticalThreats: summaryRes.severity_summary?.Critical ?? 0
       };
       setStats(statsObj);
 
       // threatDistribution: use summaryRes.severity_breakdown directly, default any missing key to 0
       const threatDistribution = {
-        Critical: summaryRes.severity_breakdown?.Critical ?? 0,
-        High: summaryRes.severity_breakdown?.High ?? 0,
-        Medium: summaryRes.severity_breakdown?.Medium ?? 0,
-        Low: summaryRes.severity_breakdown?.Low ?? 0
+        Critical: summaryRes.severity_summary?.Critical ?? 0,
+        High: summaryRes.severity_summary?.High ?? 0,
+        Medium: summaryRes.severity_summary?.Medium ?? 0,
+        Low: summaryRes.severity_summary?.Low ?? 0
       };
 
       // topAttackTypes: group predictions by threat_type, count, sort descending

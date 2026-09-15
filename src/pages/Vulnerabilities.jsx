@@ -43,6 +43,10 @@ export default function Vulnerabilities() {
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 {vulnerabilities.map((vuln) => {
+                    const displayTitle = vuln.title || vuln.cve_id || 'Unknown Vulnerability';
+                    const displayCvss = vuln.cvss_score ?? vuln.cvss ?? 'N/A';
+                    const displayAsset = vuln.asset || vuln.asset_id || 'N/A';
+                    const patchAvailable = vuln.status === 'Patched';
                     const severityStyle = SEVERITY_COLORS[vuln.severity] || SEVERITY_COLORS.Low
 
                     return (
@@ -77,14 +81,14 @@ export default function Vulnerabilities() {
                                             }}
                                         />
                                         <Typography sx={{ color: '#94A3B8', fontSize: '0.75rem' }}>
-                                            CVSS {vuln.cvss_score}
+                                            CVSS {displayCvss}
                                         </Typography>
                                     </Box>
                                     <Typography sx={{ color: '#F8FAFC', fontWeight: 600, fontSize: '0.92rem', mb: 0.5 }}>
-                                        {vuln.title}
+                                        {displayTitle}
                                     </Typography>
                                     <Typography sx={{ color: '#64748B', fontSize: '0.8rem' }}>
-                                        Asset: {vuln.asset_id}
+                                        Asset: {displayAsset}
                                     </Typography>
                                 </Box>
 
@@ -99,6 +103,14 @@ export default function Vulnerabilities() {
                                             fontSize: '0.72rem'
                                         }}
                                     />
+                                    {patchAvailable && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <FiCheckCircle size={13} color="#10B981" />
+                                            <Typography sx={{ color: '#10B981', fontSize: '0.72rem', fontWeight: 600 }}>
+                                                Patch Available
+                                            </Typography>
+                                        </Box>
+                                    )}
                                 </Box>
                             </Box>
                         </Paper>
