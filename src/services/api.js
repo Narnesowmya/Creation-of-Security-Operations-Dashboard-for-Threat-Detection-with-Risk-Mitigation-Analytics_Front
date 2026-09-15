@@ -210,7 +210,8 @@ export const getEvents = async (filters = {}) => {
 
 
 export const updateEventStatus = async (incidentId, newStatus) => {
-  const response = await apiClient.patch(`/api/v1/incidents/${incidentId}/status`, { status: newStatus });
+  const endpoint = USE_MOCK ? `/events/${incidentId}` : `/api/v1/incidents/${incidentId}/status`;
+  const response = await apiClient.patch(endpoint, { status: newStatus });
   return response.data;
 };
 
@@ -219,6 +220,10 @@ export const getVulnerabilities = async () => {
   const response = await apiClient.get('/vulnerabilities');
   const list = Array.isArray(response.data) ? response.data : (response.data?.vulnerabilities || []);
   return { vulnerabilities: list };
+};
+export const getThreats = async (params = {}) => {
+  const response = await apiClient.get('/threats', { params });
+  return response.data;
 };
 
 export const getPredictions = async () => {

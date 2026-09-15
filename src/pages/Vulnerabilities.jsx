@@ -12,7 +12,7 @@ export default function Vulnerabilities() {
     useEffect(() => {
         getVulnerabilities()
             .then((data) => {
-                setVulnerabilities(data.vulnerabilities || [])
+                setVulnerabilities(data || [])
                 setError(null)
             })
             .catch((err) => setError(err.message))
