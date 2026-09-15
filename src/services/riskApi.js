@@ -4,38 +4,16 @@ export function normalizeIncident(raw) {
   if (!raw) return null;
   const explainability = raw.explainability || {};
   let attack_chain = raw.attack_chain;
-  if (attack_chain) {
-    if (Array.isArray(attack_chain)) {
-      const sortedStages = [...attack_chain].sort((a, b) => (a.stage_order ?? 0) - (b.stage_order ?? 0));
-      const stagesList = sortedStages.map(s => s.tactic || s.technique_name || s.technique).filter(Boolean);
-      const tacticsList = [...new Set(sortedStages.map(s => s.tactic).filter(Boolean))];
-      const techniquesList = sortedStages.map(s => s.technique ? (s.technique + ' - ' + (s.technique_name || '')).trim() : (s.technique_name || null)).filter(Boolean);
-      const lastStage = sortedStages[sortedStages.length - 1];
-      attack_chain = {
-        attack_chain_id: raw.incident_id ? ('AC-' + raw.incident_id) : 'AC-001',
-        stages: stagesList,
-        current_stage: lastStage ? (lastStage.tactic || lastStage.technique_name || '') : '',
-        tactics: tacticsList.length > 0 ? tacticsList : (raw.mitre_tactics || []),
-        mitre_techniques: techniquesList.length > 0 ? techniquesList : (raw.mitre_techniques || []),
-        events: sortedStages.map(s => ({
-          event_id: s.event_id || s.technique || 'EVT-001',
-          timestamp: s.timestamp || raw.created_at || new Date().toISOString(),
-          event_type: s.technique_name || s.tactic || 'Incident Event',
-          stage_order: s.stage_order,
-          tactic: s.tactic,
-          description: s.description
-        })),
-        confidence: raw.ml_confidence ?? explainability.ml_confidence_score ?? 85,
-        start_time: sortedStages[0]?.timestamp || raw.created_at,
-        end_time: sortedStages[sortedStages.length - 1]?.timestamp || raw.updated_at || raw.created_at,
-        asset: raw.affected_asset || raw.asset_id || 'N/A',
-        source_ip: raw.source_ip || 'N/A',
-        raw_stages: sortedStages
-      };
-    } else if (attack_chain.events && Array.isArray(attack_chain.events)) {
-      const sortedEvents = [...attack_chain.events].sort((a, b) => (a.stage_order ?? 0) - (b.stage_order ?? 0));
-      attack_chain = { ...attack_chain, events: sortedEvents };
-    }
+  if (Array.isArray(attack_chain)) {
+    attack_chain = [...attack_chain]
+      .sort((a, b) => (a.stage_order ?? 0) - (b.stage_order ?? 0))
+      .map(s => ({
+        stage_order: s.stage_order,
+        tactic: s.tactic,
+        technique: s.technique,
+        technique_name: s.technique_name,
+        description: s.description
+      }));
   }
   return {
     ...raw,

@@ -8,10 +8,12 @@ import {
   FiActivity,
   FiAlertTriangle,
   FiShieldOff,
-  FiClock
+  FiClock,
+  FiTarget,
+  FiServer
 } from 'react-icons/fi';
 
-export default function KpiCards({ stats, loading }) {
+export default function KpiCards({ stats, loading, riskSummary }) {
   const theme = useTheme();
 
   const secondaryCards = [
@@ -50,6 +52,24 @@ export default function KpiCards({ stats, loading }) {
       trend: 'up',
       trendValue: '+5%',
       subtitle: 'Safe events stream'
+    },
+    {
+      title: 'Active Incidents',
+      value: riskSummary?.active_incidents ?? stats?.activeIncidents ?? 0,
+      icon: FiTarget,
+      color: SEVERITY_COLORS.High,
+      trend: 'down',
+      trendValue: '-1',
+      subtitle: 'Open & under triage'
+    },
+    {
+      title: 'Affected Assets',
+      value: riskSummary?.affected_assets ?? stats?.affectedAssets ?? 0,
+      icon: FiServer,
+      color: { main: theme.palette.primary.main, bg: 'rgba(34, 211, 238, 0.15)', border: 'rgba(34, 211, 238, 0.4)', glow: '0 0 15px rgba(34, 211, 238, 0.3)' },
+      trend: 'up',
+      trendValue: '+1',
+      subtitle: 'Monitored infrastructure'
     }
   ];
 
@@ -63,11 +83,11 @@ export default function KpiCards({ stats, loading }) {
           </MouseGlowTiltCard>
         </Grid>
 
-        {/* Right 2x2 Grid for Remaining 4 Cards (~60% desktop) */}
+        {/* Right Grid for Secondary Cards (~60% desktop) */}
         <Grid item xs={12} lg={7}>
           <Grid container spacing={2}>
             {secondaryCards.map((card, idx) => (
-              <Grid item xs={12} sm={6} key={idx}>
+              <Grid item xs={12} sm={6} md={4} key={idx}>
                 <MouseGlowTiltCard glowColor={card.color?.main || theme.palette.primary.main}>
                   <KpiCard
                     title={card.title}
@@ -87,4 +107,4 @@ export default function KpiCards({ stats, loading }) {
       </Grid>
     </Box>
   );
-}
+}
